@@ -1,0 +1,77 @@
+{% extends "journal/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <h3>Entries</h3>
+
+    <div class="container-fluid">
+        <div class="row">
+
+            {% for entry in page_obj.object_list %}
+                <div class="card card-entry">
+                    <div class="card-body">
+
+                        <div class="row">
+                            <div class="col">
+                                <h5 class="card-title">{{ entry.timestamp }}</h5>
+                            </div>
+                            <div class="col">
+                                <p class="float-end"><span class="mood{{ entry.mood }}"></span></p>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-5">
+                                {% if entry.activity_set.all.exists %}
+                                    <h6 class="card-subtitle mb-2 text-muted">Activities</h6>
+                                    <h6>
+                                        {% for activity in entry.activity_set.all %}
+                                            <span class="badge rounded-pill activity-bg">{{ activity.name.capitalize }}</span>
+                                        {% endfor %}
+                                    </h6>
+                                {% endif %}
+                                {% if entry.distortion_set.all.exists %}
+                                    <h6 class="card-subtitle mb-2 text-muted">Distortions</h6>
+                                    <h6>
+                                        {% for distortion in entry.distortion_set.all %}
+                                            <span class="badge rounded-pill distortion-bg" data-bs-toggle="tooltip" data-bs-placement="top" title="{{ distortion.blurb }}"><i class="{{ distortion.icon }}"></i> {{ distortion.name }}</span>
+                                        {% endfor %}
+                                    </h6>
+                                {% endif %}
+                            </div>
+
+                            <div class="col" style="margin-top:1rem;">
+                                <p class="card-text">{{ entry.truncated_events }}</p>
+                                <p class="float-end"><a href="{% url 'entry' entry.id %}">View More</a></p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            {% endfor %}
+
+        </div>
+
+        <nav aria-label="Page navigation">
+            <ul class="pagination d-flex justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+                {% endif %}
+
+                {% if page_obj.has_previous or page_obj.has_next %}
+                <li class="page-item active" aria-current="page">
+                    <p class="page-link">{{page_obj.number}} <span class="sr-only">(current)</span></p>
+                </li>
+                {% endif %}
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'journal/tooltips.js' %}"></script>
+{% endblock %}
